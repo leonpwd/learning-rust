@@ -1,39 +1,62 @@
-use std::io; //Librairie input/output io dans std
-use rand::Rng; //Librairie random dans rand
-use std::cmp::Ordering; //Librairie comparaison dans std
-
 fn main() {
-    hello_world();
-    devinette();
-}
+    // In general, the `{}` will be automatically replaced with any
+    // arguments. These will be stringified.
+    println!("{} days", 31);
 
-fn devinette() {
-    
-    let secret_number = rand::thread_rng().gen_range(1..=100);
-    println!("Le chiffre secret est : {}", secret_number);
-    
-    println!("Devine le chiffre que j'ai décidé ! : ");
-    
-    let mut guess = String::new(); 
-    //let ça crée un tuple par défaut, inchangeable, sauf si on rajoute mut dessus
-    //String::new ça signifie que on crée un nouveau string vide (UTF-8)
-    
-    io::stdin() //fonction stdin incluse dans io, avec des méthodes en dessous
-        .read_line(&mut guess)
-        .expect("Echec de lecture...");
-    
-    let guess: u32 = guess.trim().parse().expect("Tu n'as pas entré un nombre !");
-    
-    match guess.cmp(&secret_number) {
-        Ordering::Less => println!("Trop petit !"),
-        Ordering::Greater => println!("Trop grand !"),
-        Ordering::Equal => println!("Félicitations, tu as gagné !"),
-    }
-    
-    std::io::stdin().read_line(&mut String::new()).unwrap();
-}
+    // Positional arguments can be used. Specifying an integer inside `{}`
+    // determines which additional argument will be replaced. Arguments start
+    // at 0 immediately after the format string.
+    println!("{0}, this is {1}. {1}, this is {0}", "Alice", "Bob");
 
-fn hello_world() {
-    println!("Hello, world!\n");
-    std::io::stdin().read_line(&mut String::new()).unwrap(); //pour attendre une touche pressée avant de poursuivre
+    // As can named arguments.
+    println!("{subject} {verb} {object}",
+             object="the lazy dog",
+             subject="the quick brown fox",
+             verb="jumps over");
+
+    // Different formatting can be invoked by specifying the format character
+    // after a `:`.
+    println!("Base 10:               {}",   69420); // 69420
+    println!("Base 2 (binary):       {:b}", 69420); // 10000111100101100
+    println!("Base 8 (octal):        {:o}", 69420); // 207454
+    println!("Base 16 (hexadecimal): {:x}", 69420); // 10f2c
+
+    // You can right-justify text with a specified width. This will
+    // output "    1". (Four white spaces and a "1", for a total width of 5.)
+    println!("{number:a>5}", number=1);
+
+    // You can pad numbers with extra zeroes,
+    println!("{number:0>5}", number=1); // 00001
+    // and left-adjust by flipping the sign. This will output "10000".
+    println!("{number:0<5}", number=1); // 10000
+
+    // You can use named arguments in the format specifier by appending a `$`.
+    println!("{number:1>width$}", number=1, width=5); //     1
+
+    // Rust even checks to make sure the correct number of arguments are used.
+    println!("My name is {0}, {1} {0}", "Bond", "ANTOINE DUPONT");
+    // FIXME ^ Add the missing argument: "James"
+
+    // Only types that implement fmt::Display can be formatted with `{}`. User-
+    // defined types do not implement fmt::Display by default.
+
+    #[allow(dead_code)] // disable `dead_code` which warn against unused module
+    struct Structure(i32);
+
+    // This will not compile because `Structure` does not implement
+    // fmt::Display.
+    //println!("This struct `{}` won't print...", Structure(3));
+    // TODO ^ Try uncommenting this line
+
+    // For Rust 1.58 and above, you can directly capture the argument from a
+    // surrounding variable. Just like the above, this will output
+    // "    1", 4 white spaces and a "1".
+    let number: f64 = 1.0;
+    let width: usize = 5;
+    println!("{number:>width$}");
+    
+    
+    let _pi = 3.14159265358979;
+    let precision: usize = 6;
+    println!("Pi is roughly {_pi:.0$}", precision);
 }
